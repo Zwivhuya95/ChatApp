@@ -2,126 +2,81 @@ package com.mycompany.chatapp;
 
 import java.util.regex.Pattern;
 
-/**
- * Handles user registration and login authentication.
- */
 public class Login {
-
-    private String firstName;
-    private String lastName;
     private String username;
     private String password;
-    private String cellPhoneNumber;
+    private String cellphone;
+    private String firstName;
+    private String lastName;
+    private boolean isLoggedIn = false;
 
-    // South African international number: +27 followed by 9 digits.
-    private static final Pattern PHONE_PATTERN =
-            Pattern.compile("^\\+27[0-9]{9}$");
-
-    public Login() {
-    }
-
-    public Login(String firstName, String lastName) {
-        this.firstName = firstName == null ? "" : firstName.trim();
-        this.lastName = lastName == null ? "" : lastName.trim();
-    }
-
-    /**
-     * Username must contain an underscore and be
-     * no longer than five characters.
-     */
     public boolean checkUserName(String username) {
-        return username != null
-                && username.length() <= 5
-                && username.contains("_");
+        if (username == null) return false;
+        // Contains an underscore (_) and is no more than 5 characters long
+        return username.contains("_") && username.length() <= 5;
     }
 
-    /**
-     * Password must contain at least eight characters,
-     * one uppercase letter, one digit and one special character.
-     */
     public boolean checkPasswordComplexity(String password) {
-        return password != null
-                && password.length() >= 8
-                && password.matches(".*[A-Z].*")
-                && password.matches(".*[0-9].*")
-                && password.matches(".*[^A-Za-z0-9].*");
+        if (password == null) return false;
+        // At least 8 characters long, contain a capital letter, a number, and a special character.
+        boolean lengthOk = password.length() >= 8;
+        boolean upperOk = false;
+        boolean numOk = false;
+        boolean specialOk = false;
+
+        String specialChars = "!@#$%^&*()_+-=[]{};':\"|,.<>/?~`";
+
+        for (int i = 0; i < password.length(); i++) {
+            char c = password.charAt(i);
+            if (Character.isUpperCase(c)) upperOk = true;
+            else if (Character.isDigit(c)) numOk = true;
+            else if (specialChars.indexOf(c) >= 0) specialOk = true;
+        }
+
+        return lengthOk && upperOk && numOk && specialOk;
     }
 
-    /**
-     * Validates an international South African cellphone number.
-     */
-    public boolean checkCellPhoneNumber(String number) {
-        return number != null
-                && PHONE_PATTERN.matcher(number).matches();
+    public boolean checkCellPhoneNumber(String cellphone) {
+        if (cellphone == null) return false;
+        String regex = "^\\+[0-9]{1,3}[0-9]{9,10}$";
+        return Pattern.matches(regex, cellphone);
     }
 
-    /**
-     * Registers the user if all validation rules are satisfied.
-     */
-    public String registerUser(
-            String username,
-            String password,
-            String cellPhoneNumber) {
+    public String registerUser(String username, String password, String cellphone, String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
 
         if (!checkUserName(username)) {
-            return "Username is incorrectly formatted. "
-                    + "It must contain an underscore and be "
-                    + "no more than five characters long.";
+            return "Username is not correctly formatted; please ensure that your username contains an underscore and is no more than five characters in length.";
         }
-
         if (!checkPasswordComplexity(password)) {
-            return "Password is incorrectly formatted. "
-                    + "Use at least eight characters, an uppercase "
-                    + "letter, a number and a special character.";
+            return "Password is not correctly formatted; please ensure that the password contains at least eight characters, a capital letter, a number, and a special character.";
         }
-
-        if (!checkCellPhoneNumber(cellPhoneNumber)) {
-            return "Cellphone number is incorrectly formatted. "
-                    + "Use +27 followed by nine digits.";
+        if (!checkCellPhoneNumber(cellphone)) {
+            return "Cell phone number is incorrectly formatted or does not contain an international code; please correct the number and try again.";
         }
 
         this.username = username;
         this.password = password;
-        this.cellPhoneNumber = cellPhoneNumber;
-
-        return "Registration successful!";
+        this.cellphone = cellphone;
+        return "The two above conditions have been met, and the user has been registered successfully.";
     }
 
-    /**
-     * Checks whether the supplied login details match
-     * the registered account.
-     */
-    public boolean loginUser(
-            String enteredUsername,
-            String enteredPassword) {
-
-        return username != null
-                && password != null
-                && username.equals(enteredUsername)
-                && password.equals(enteredPassword);
+    public boolean loginUser(String enteredUsername, String enteredPassword) {
+        if (this.username == null || this.password == null) return false;
+        isLoggedIn = this.username.equals(enteredUsername) && this.password.equals(enteredPassword);
+        return isLoggedIn;
     }
 
-    /**
-     * Returns an appropriate login confirmation or error message.
-     */
-    public String returnLoginStatus(boolean loginSuccessful) {
-
-        if (loginSuccessful) {
-            String fullName =
-                    (firstName + " " + lastName).trim();
-
-            return "Welcome " + fullName
-                    + ", it is great to see you again.";
+    public String returnLoginStatus(boolean success) {
+        if (success) {
+            return "Welcome " + firstName + " " + lastName + ", it is great to see you again.";
+        } else {
+            return "Username or password incorrect, please try again.";
         }
-
-        return "Username or password incorrect. Please try again.";
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getCellPhoneNumber() {
-        return cellPhoneNumber;
+    public boolean isLoggedIn() {
+        return isLoggedIn;
     }
 }

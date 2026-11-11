@@ -6,36 +6,52 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LoginTest {
 
     @Test
-    public void testValidUsername() {
+    public void testUsernameCorrect() {
         Login login = new Login();
-
-        // Username contains an underscore and is
-        // no more than 5 characters long.
-        assertTrue(login.checkUserName("ab_1"));
+        assertTrue(login.checkUserName("kyl_1"));
     }
 
     @Test
-    public void testInvalidUsername() {
+    public void testUsernameIncorrect() {
         Login login = new Login();
-
-        // Username is too long.
-        assertFalse(login.checkUserName("username"));
+        assertFalse(login.checkUserName("kyle!!!!!!"));
     }
 
     @Test
-    public void testValidPassword() {
+    public void testPasswordComplex() {
         Login login = new Login();
-
-        // Example: uppercase, number, special character,
-        // and at least 8 characters.
-        assertTrue(login.checkPasswordComplexity("Passw0rd!"));
+        assertTrue(login.checkPasswordComplexity("Ch&&rec#99!"));
     }
 
     @Test
-    public void testInvalidPassword() {
+    public void testPasswordSimple() {
         Login login = new Login();
+        assertFalse(login.checkPasswordComplexity("password"));
+    }
 
-        // Password is too short and lacks complexity.
-        assertFalse(login.checkPasswordComplexity("abc"));
+    @Test
+    public void testCellPhoneCorrect() {
+        Login login = new Login();
+        assertTrue(login.checkCellPhoneNumber("+27838968976"));
+    }
+
+    @Test
+    public void testCellPhoneIncorrect() {
+        Login login = new Login();
+        assertFalse(login.checkCellPhoneNumber("08966553"));
+    }
+
+    @Test
+    public void testLoginSuccess() {
+        Login login = new Login();
+        login.registerUser("kyl_1", "Ch&&rec#99!", "+27838968976", "Kyle", "Test");
+        assertTrue(login.loginUser("kyl_1", "Ch&&rec#99!"));
+    }
+
+    @Test
+    public void testLoginFailure() {
+        Login login = new Login();
+        login.registerUser("kyl_1", "Ch&&rec#99!", "+27838968976", "Kyle", "Test");
+        assertFalse(login.loginUser("kyl_1", "WrongPassword"));
     }
 }
