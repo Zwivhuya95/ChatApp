@@ -1,8 +1,5 @@
 package com.mycompany.chatapp;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class Message {
     private String messageID;
@@ -62,4 +59,3 @@ public class Message {
     public String getMessageHash() { return messageHash; }
     public int getMessageNumber() { return messageNumber; }
 }
-
